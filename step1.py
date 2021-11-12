@@ -3,11 +3,11 @@ import numpy as np
 import pandas as pd
 import os
 
-year_length_thre = 10
-year_nan_thre = 365
+year_length_thre = 20
+year_nan_thre = 10
 
 
-main_addr = r"E:\li zhen\Multi-source data Li Zhen\Daily data\CA_prep" #文件夹目录
+main_addr = r"E:\li zhen\Multi-source data Li Zhen\Daily data\CA_prep 1.0" #文件夹目录
 
 
 files= os.listdir(main_addr)
@@ -15,7 +15,7 @@ files= os.listdir(main_addr)
 def select(data):
 
     if data['year'].unique().shape[0] < year_length_thre:
-        return False
+        return [False, None]
 
     data[data == 9999.99] = np.nan
     data[data == -9999] = np.nan
@@ -24,27 +24,29 @@ def select(data):
         a = x.isna().sum()
         return a
 
-    a = data['data'].groupby(data['year']).apply(lambda x: find_nan(x))
+    a = data['data'].groupby(data['year']).apply(lambda x: find_nan(x)).reset_index()
+    if len(a[a['data']<year_nan_thre]) > 20:
 
-    if a.max() <= year_nan_thre:
-        return True
+        return [True, a[a['data']<=year_nan_thre].year.unique()]
     else:
-        return False
+        return [False, None]
 
-choose_station = []
-
+choose_station = pd.DataFrame()
 for filename in files:
     data = pd.read_csv(main_addr + r'/%s' % filename, delim_whitespace=True, header=None,
                        names=['year', 'month', 'day', 'data'])
     judge = select(data)
-    if judge:
+
+    if judge[0]:
+        print(judge[1])
         print(filename)
-        choose_station.append(filename)
-print(choose_station)
+        sdf = pd.DataFrame()
+        sdf[filename[:-4]]=judge[1]
+        choose_station = pd.concat([choose_station, sdf], axis=1)
 
-np.savetxt('choose_station.csv', choose_station)
+choose_station.T.to_csv('try.csv')
 
-choose_station = np.loadtxt('choose_station.csv')
+
 #
 #
 # for filename in choose_station:

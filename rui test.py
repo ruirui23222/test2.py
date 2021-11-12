@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 year_length_thre = 50
-year_nan_thre = 50
+year_nan_thre = 30
 
 
 main_addr = r"E:\li zhen\Multi-source data Li Zhen\Daily data\CA prep 3.0" #文件夹目录
@@ -25,7 +25,7 @@ def select(data):
 
     a = data['data'].groupby(data['year']).apply(lambda x: find_nan(x))#groupby分组 lambda x，每个字符串去空格处理
 
-    if a.max() >= year_nan_thre:#50
+    if a.min() <= year_nan_thre:#50
         return False
     else:
         return True
