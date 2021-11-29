@@ -3,11 +3,12 @@ import numpy as np
 import pandas as pd
 import os
 
-year_length_thre = 20
+year_length_thre = 0
 year_nan_thre = 10
 
 
-main_addr = r"E:\li zhen\Multi-source data Li Zhen\Daily data\CA_prep 1.0" #文件夹目录
+# main_addr = r"E:\li zhen\Multi-source data Li Zhen\Daily data\CA_prep 1.0" #文件夹目录
+main_addr = r"E:\project\1940-1990CA_txt" #文件夹目录
 
 
 files= os.listdir(main_addr)
@@ -25,26 +26,28 @@ def select(data):
         return a
 
     a = data['data'].groupby(data['year']).apply(lambda x: find_nan(x)).reset_index()
-    if len(a[a['data']<year_nan_thre]) > 20:
+    if len(a[a['data']<year_nan_thre]) > 10:
 
         return [True, a[a['data']<=year_nan_thre].year.unique()]
     else:
         return [False, None]
 
 choose_station = pd.DataFrame()
-for filename in files:
+for filename in files[:50]:
     data = pd.read_csv(main_addr + r'/%s' % filename, delim_whitespace=True, header=None,
                        names=['year', 'month', 'day', 'data'])
+    # data = pd.read_csv(main_addr + r'/%s' % filename, index_col=0)
+    # print(data)
     judge = select(data)
 
     if judge[0]:
-        print(judge[1])
-        print(filename)
-        sdf = pd.DataFrame()
+
+        sdf = pd.DataFrame(index=judge[1])
         sdf[filename[:-4]]=judge[1]
         choose_station = pd.concat([choose_station, sdf], axis=1)
-
-choose_station.T.to_csv('try.csv')
+        # print(choose_station)
+choose_station[choose_station>0]=1
+choose_station.T.to_csv('1940-1990_non10.csv')
 
 
 #
