@@ -8,7 +8,7 @@ year_nan_thre = 10
 
 
 # main_addr = r"E:\li zhen\Multi-source data Li Zhen\Daily data\CA_prep 1.0" #文件夹目录
-main_addr = r"E:\project\1940-1990CA_txt" #文件夹目录
+main_addr = r"E:\li zhen\Multi-source data Li Zhen\Daily data\CA_tm - 1.0" #文件夹目录
 
 
 files= os.listdir(main_addr)
@@ -47,7 +47,7 @@ for filename in files[:50]:
         choose_station = pd.concat([choose_station, sdf], axis=1)
         # print(choose_station)
 choose_station[choose_station>0]=1
-choose_station.T.to_csv('1940-1990_non10.csv')
+choose_station.T.to_csv('all102.0_non10.csv')
 
 
 #
